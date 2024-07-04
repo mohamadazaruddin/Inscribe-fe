@@ -8,5 +8,6 @@ module.exports = {
   accent: "#FFC300",
   background: "#EDEDED",
   text: "#333333",
+  "gray-200":"#8D8D8D",
   "contrast-200": "#fff",
 };

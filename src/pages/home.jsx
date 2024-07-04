@@ -12,10 +12,13 @@ import Notifications from "../components/Notifications";
 import Profile from "../components/Profile";
 import { useCookies } from "react-cookie";
 import AuthContext from "../services/context/AuthContext";
+import { toast } from "react-toastify";
 import axios from "axios";
 export default function Home() {
   const [viewSection, setViewSection] = React.useState("Home");
   const [userDetails, setUserDetails] = React.useState();
+  const [postsData, setPostsData] = React.useState();
+
   const [cookies] = useCookies(["user"]);
   const { logout } = useContext(AuthContext);
   const navItems = [
@@ -43,30 +46,75 @@ export default function Home() {
   ];
 
   const fetchUserDetails = () => {
-    if (cookies) {
-      // to fetch user detail using user ID
-      axios
-        .get(`${process.env.REACT_APP_API_BASE_URL}/users/${cookies.user._id}`)
-        .then(function (response) {
-          setUserDetails(response.data);
-        })
-        .catch(function (err) {
-          console.log(err, "err");
-        });
-    }
+    // to fetch user detail using user ID
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/users/${cookies.user._id}`)
+      .then(function (response) {
+        setUserDetails(response.data);
+      })
+      .catch(function (err) {
+        console.log(err, "err");
+      });
   };
 
+  const fetchPost = () => {
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/post?query=newest`)
+      .then(function (response) {
+        setPostsData(response.data.posts);
+        console.log(response.data.posts[0].user.userName, "posts");
+      })
+      .catch(function (err) {
+        console.log(err, "err");
+      });
+  };
+  const handlecreatepost = (data) => {
+    axios
+      .post(`${process.env.REACT_APP_API_BASE_URL}/post/${cookies.user._id}`, {
+        content: data,
+      })
+      .then(function (response) {
+        toast.success(`Posted Successfully`, {
+          autoClose: 1000,
+        });
+        setViewSection("Home");
+        fetchPost();
+      })
+      .catch(function (err) {
+        toast.error(`${err.message}`, {
+          autoClose: 1000,
+        });
+      });
+  };
   useEffect(() => {
-    fetchUserDetails();
+    if (cookies.user) {
+      fetchUserDetails();
+      fetchPost();
+    }
   }, []);
 
   return (
-    <div className="bg-[#fafafa] w-full h-full p-5 md:p-10 ">
+    <div className="bg-[#fafafa] w-full h-full p-5  ">
       <div className="block md:hidden relative w-full h-full">
         {viewSection === "Home" && (
-          <div className="h-full w-full ">
-            <Posts />
-          </div>
+          <>
+            {postsData && (
+              <div className=" posts h-full w-full overflow-y-auto ">
+                {postsData?.map((item, i) => (
+                  <div key={i}>
+                    <Posts
+                      image={item?.user?.profileAvatar}
+                      username={item?.user?.userName}
+                      createdtime={item?.createdAt}
+                      content={item.content}
+                      comment={""}
+                    />
+                  </div>
+                  // <Posts image={item.} username={item.} createdtime={} content={item.content} comment={} />
+                ))}
+              </div>
+            )}
+          </>
         )}
         {viewSection === "Explore" && (
           <div className="h-full w-full ">
@@ -75,7 +123,11 @@ export default function Home() {
         )}
         {viewSection === "Create" && (
           <div className="h-full w-full ">
-            <CreatePostModal />
+            <CreatePostModal
+              mobView={true}
+              image={cookies.user.profileAvatar}
+              handlecreatepost={handlecreatepost}
+            />
           </div>
         )}
         {viewSection === "Notification" && (
@@ -85,7 +137,7 @@ export default function Home() {
         )}
         {viewSection === "Profile" && (
           <div className="h-full w-full ">
-            <Profile data={userDetails && userDetails} />
+            {userDetails && <Profile data={userDetails} />}
           </div>
         )}
 
@@ -95,9 +147,48 @@ export default function Home() {
           setViewSection={setViewSection}
         />
       </div>
-      <div className="hidden md:block">
-        Hello {cookies && cookies.user.userName}
-        <button onClick={logout}>logout</button>
+      <div className="hidden md:block  h-full">
+        <div className="flex gap-5 h-full">
+          <div className="w-[400px] h-full bg-contrast-200">
+            {userDetails && <Profile data={userDetails} />}
+          </div>
+          <div className="w-full h-full overflow-hidden">
+            <div>
+              <CreatePostModal
+                mobView={false}
+                image={cookies.user.profileAvatar}
+                handlecreatepost={handlecreatepost}
+              />
+            </div>
+            <div className="h-full">
+              {postsData && (
+                <div className=" posts h-full w-full overflow-y-auto ">
+                  {postsData?.map((item, i) => (
+                    <div key={i}>
+                      <Posts
+                        image={item?.user?.profileAvatar}
+                        username={item?.user?.userName}
+                        createdtime={item?.createdAt}
+                        content={item.content}
+                        comment={""}
+                      />
+                    </div>
+                    // <Posts image={item.} username={item.} createdtime={} content={item.content} comment={} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="w-[400px] bg-contrast-200">
+            <div>
+              <Explore />
+            </div>
+            <div>
+              <Notifications />
+            </div>
+          </div>
+        </div>
+        {/* <button onClick={logout}>logout</button> */}
       </div>
     </div>
   );

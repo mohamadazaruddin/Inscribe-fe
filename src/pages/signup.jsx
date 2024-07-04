@@ -16,7 +16,7 @@ export default function Signup() {
       .post(`${process.env.REACT_APP_API_BASE_URL}/users/signup`, {
         username: username,
         password: password,
-        profileAvatar: profileAvatar,
+        profilepicture: profileAvatar,
       })
       .then(function (response) {
         const user = {
@@ -85,7 +85,8 @@ export default function Signup() {
           <ProfileAvatarSelector />
         ) : (
           <form onSubmit={handleLogin} className="mt-8">
-            <div className="mb-4">
+            <div className="text-center text-[24px] font-semibold"> Log In</div>
+            <div className="my-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
                 htmlFor="username"

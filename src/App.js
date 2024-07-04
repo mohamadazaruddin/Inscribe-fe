@@ -6,6 +6,7 @@ import "./styles/App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Fragment } from "react";
 import { CookiesProvider, useCookies } from "react-cookie";
+import { ToastContainer } from "react-toastify";
 import { AuthProvider } from "./services/context/AuthContext";
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
 function AppRoutes() {
   return (
     <Fragment>
+      <ToastContainer />
       <AuthProvider>
         <CookiesProvider>
           <Routes>
