@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import { Outlet, Link } from "react-router-dom";
-
+import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
+import AuthContext from "../services/context/AuthContext";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const handleLogin = (e) => {
+  const { login } = useContext(AuthContext);
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Username:", username);
-    console.log("Password:", password);
+    login({ username, password });
   };
   return (
-    <div className="bg-primary-200 h-full px-5 py-10 flex items-center justify-center">
-      <div className="mx-auto py-6  px-4 w-full  bg-white shadow-md rounded ">
+    <div className="bg-primary-200 h-full px-5 py-10 flex items-center justify-center ">
+      <div className="mx-auto py-6  px-4 w-full  bg-white shadow-md rounded md:w-[500px] ">
         <img
           src="/assets/images/appLogo.svg"
           alt="logo"
@@ -58,9 +58,8 @@ export default function Login() {
             Log In
           </button>
           <div className="text-xs text-right mt-1">
-            Not Registered Yet ?{" "}
+            Not registered yet ?
             <Link to="/signup" className="text-primary-500">
-              {" "}
               Sign up
             </Link>
           </div>
