@@ -14,6 +14,8 @@ import { useCookies } from "react-cookie";
 import AuthContext from "../services/context/AuthContext";
 import { toast } from "react-toastify";
 import axios from "axios";
+import UserSuggestions from "../components/User/UserSuggestions"
+
 export default function Home() {
   const [viewSection, setViewSection] = React.useState("Home");
   const [userDetails, setUserDetails] = React.useState();
@@ -104,6 +106,7 @@ export default function Home() {
 
   return (
     <div className="bg-[#fafafa] w-full h-full p-5  ">
+         {/* <UserSuggestions/> */}
       <div className="block md:hidden relative w-full h-full">
         {viewSection === "Home" && (
           <>
