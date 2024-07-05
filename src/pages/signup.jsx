@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import avatars from "../faceline/faceline.json";
 import AuthContext from "../services/context/AuthContext";
+import { toast } from "react-toastify";
 export default function Signup() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -23,10 +24,15 @@ export default function Signup() {
           username: username,
           password: password,
         };
+        toast.success(response.message, {
+          autoClose: 1000,
+        });
         login(user);
       })
       .catch(function (err) {
-        console.log(err, "err");
+        toast.error(`${err.response.data.message}`, {
+          autoClose: 3000,
+        });
       });
   };
 

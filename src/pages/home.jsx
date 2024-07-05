@@ -45,6 +45,16 @@ export default function Home() {
     },
   ];
 
+  const fetchExploreData = () => {
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/users/${cookies.user._id}`)
+      .then(function (response) {
+        setUserDetails(response.data);
+      })
+      .catch(function (err) {
+        console.log(err, "err");
+      });
+  };
   const fetchUserDetails = () => {
     // to fetch user detail using user ID
     axios
@@ -62,7 +72,6 @@ export default function Home() {
       .get(`${process.env.REACT_APP_API_BASE_URL}/post?query=newest`)
       .then(function (response) {
         setPostsData(response.data.posts);
-        console.log(response.data.posts[0].user.userName, "posts");
       })
       .catch(function (err) {
         console.log(err, "err");
@@ -81,7 +90,7 @@ export default function Home() {
         fetchPost();
       })
       .catch(function (err) {
-        toast.error(`${err.message}`, {
+        toast.error(err.response.data.message, {
           autoClose: 1000,
         });
       });

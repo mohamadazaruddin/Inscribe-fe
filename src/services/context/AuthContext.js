@@ -18,19 +18,18 @@ export const AuthProvider = ({ children }) => {
           password: data.password,
         })
         .then(function (response) {
-          setCookie("user", response.data.user, { path: "/", maxAge: 2592000 });
+          setCookie("user", response.data.user, { path: "/", maxAge: 18000 });
           setCookie("token", response.data.token, { path: "/" });
-          toast.success(`login successfully`, {
+          toast.success(response.message, {
             autoClose: 1000,
           });
           navigate("/home");
           return;
         })
         .catch(function (err) {
-          toast.error(`${err.message}`, {
+          toast.error(`${err.response.data.message}`, {
             autoClose: 3000,
           });
-          console.log(err, "err");
         });
     } catch (err) {}
   };
