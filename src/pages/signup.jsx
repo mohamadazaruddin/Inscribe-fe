@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 export default function Signup() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [bio, setBio] = useState("");
   const [stepper, setStepper] = useState(0);
   const [viewpass, setViewpass] = useState(false);
   const { login } = useContext(AuthContext);
@@ -18,15 +19,16 @@ export default function Signup() {
         username: username,
         password: password,
         profilepicture: profileAvatar,
+        bio: bio,
       })
       .then(function (response) {
+        toast.success(response.message, {
+          autoClose: 1000,
+        });
         const user = {
           username: username,
           password: password,
         };
-        toast.success(response.message, {
-          autoClose: 1000,
-        });
         login(user);
       })
       .catch(function (err) {
@@ -91,7 +93,10 @@ export default function Signup() {
           <ProfileAvatarSelector />
         ) : (
           <form onSubmit={handleLogin} className="mt-8">
-            <div className="text-center text-[24px] font-semibold"> Log In</div>
+            <div className="text-center text-[24px] font-semibold">
+              {" "}
+              Create Account
+            </div>
             <div className="my-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
@@ -128,6 +133,24 @@ export default function Signup() {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="my-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="bio"
+              >
+                Bio
+              </label>
+              <textarea
+                style={{ resize: "none" }}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="bio"
+                type="text"
+                placeholder="About..."
+                value={bio}
+                rows={5}
+                onChange={(e) => setBio(e.target.value)}
               />
             </div>
             <button

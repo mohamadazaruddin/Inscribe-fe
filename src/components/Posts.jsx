@@ -21,16 +21,27 @@ export default function Posts(props) {
           </div>
         </div>
 
-        <div className="p-5 text-md font-medium border-b border-primary-200">
+        <div className="p-5 text-sm font-medium border-b border-primary-200">
           {props.content}
         </div>
         <div className="flex px-5 items-center justify-start py-2 gap-3">
-          <div className=" justify-center flex rounded-full items-center p-2 shadow-sm border-b border-primary-200 ">
+          <div
+            className=" justify-center flex rounded-full gap-2 items-center p-2 shadow-sm border-b border-primary-200 cursor-pointer"
+            onClick={() => {
+              props.likePost(props.postId);
+            }}
+          >
             <LikeIcon height="18px" width="18px" color="#374151" />
           </div>
-          <div className=" justify-center flex gap-2 rounded-full items-center p-2 shadow-sm border-b border-primary-200 text-[#374151]">
+          <div className="text-sm text-black cursor-pointer">{props.likes}</div>
+          <div
+            className=" justify-center flex gap-2 rounded-full items-center p-2 shadow-sm border-b border-primary-200 text-[#374151]"
+            onClick={() => props.setOpenComments(props.postId)}
+          >
             <Comment height="18px" width="18px" color="#374151" />
-            <div className="text-xs">{props.comment}</div>
+            <div className="text-sm text-black cursor-pointer">
+              {props.comment}
+            </div>
           </div>
           <div className=" justify-center flex rounded-full items-center p-2 border-b border-primary-200 ">
             <ShareIcon height="18px" width="18px" color="#374151" />

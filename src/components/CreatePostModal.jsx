@@ -44,7 +44,7 @@ export default function CreatePostModal(props) {
             <button
               type="submit"
               disabled={!createPost.length > 0}
-              className="block px-5 text-center bg-primary-500 rounded-sm py-2 text-md font-medium text-contrast-200"
+              className="block px-5 text-center bg-primary-500 rounded-sm py-1 text-sm font-medium text-contrast-200"
             >
               Post
             </button>

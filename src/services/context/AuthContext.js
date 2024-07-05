@@ -18,7 +18,10 @@ export const AuthProvider = ({ children }) => {
           password: data.password,
         })
         .then(function (response) {
-          setCookie("user", response.data.user, { path: "/", maxAge: 18000 });
+          setCookie("user", response.data.loggedInuser, {
+            path: "/",
+            maxAge: 18000,
+          });
           setCookie("token", response.data.token, { path: "/" });
           toast.success(response.message, {
             autoClose: 1000,

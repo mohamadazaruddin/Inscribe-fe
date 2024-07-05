@@ -14,12 +14,14 @@ import { useCookies } from "react-cookie";
 import AuthContext from "../services/context/AuthContext";
 import { toast } from "react-toastify";
 import axios from "axios";
-import UserSuggestions from "../components/User/UserSuggestions"
+import CommentSection from "../components/CommentSection";
 
 export default function Home() {
   const [viewSection, setViewSection] = React.useState("Home");
   const [userDetails, setUserDetails] = React.useState();
   const [postsData, setPostsData] = React.useState();
+  const [totalusers, setTotalUsers] = React.useState();
+  const [openComments, setOpenComments] = React.useState("");
 
   const [cookies] = useCookies(["user"]);
   const { logout } = useContext(AuthContext);
@@ -49,18 +51,17 @@ export default function Home() {
 
   const fetchExploreData = () => {
     axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}/users/${cookies.user._id}`)
+      .get(`${process.env.REACT_APP_API_BASE_URL}/users`)
       .then(function (response) {
-        setUserDetails(response.data);
+        setTotalUsers(response.data);
       })
       .catch(function (err) {
         console.log(err, "err");
       });
   };
   const fetchUserDetails = () => {
-    // to fetch user detail using user ID
     axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}/users/${cookies.user._id}`)
+      .get(`${process.env.REACT_APP_API_BASE_URL}/users/${cookies.user.id}`)
       .then(function (response) {
         setUserDetails(response.data);
       })
@@ -73,7 +74,7 @@ export default function Home() {
     axios
       .get(`${process.env.REACT_APP_API_BASE_URL}/post?query=newest`)
       .then(function (response) {
-        setPostsData(response.data.posts);
+        setPostsData(response.data.postContent);
       })
       .catch(function (err) {
         console.log(err, "err");
@@ -81,7 +82,7 @@ export default function Home() {
   };
   const handlecreatepost = (data) => {
     axios
-      .post(`${process.env.REACT_APP_API_BASE_URL}/post/${cookies.user._id}`, {
+      .post(`${process.env.REACT_APP_API_BASE_URL}/post/${userDetails.id}`, {
         content: data,
       })
       .then(function (response) {
@@ -101,12 +102,73 @@ export default function Home() {
     if (cookies.user) {
       fetchUserDetails();
       fetchPost();
+      fetchExploreData();
+      // add like
+      // get like
+      // add comment
+      // get comment
+      // add follow
     }
   }, []);
 
+  const likePost = (id) => {
+    axios
+      .post(`${process.env.REACT_APP_API_BASE_URL}/post/${id}/like`, {
+        userId: userDetails.id,
+      })
+      .then(function (response) {
+        fetchPost();
+      })
+      .catch(function (err) {
+        toast.error(err.response.data.message, {
+          autoClose: 1000,
+        });
+      });
+  };
+
+  const getComment = () => {
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/post/${openComments}/comment`)
+      .then(function (response) {
+        console.log(response, "comments");
+      })
+      .catch(function (err) {
+        console.log(err, "err");
+      });
+  };
+
+  useEffect(() => {
+    if (openComments.length > 0) {
+      getComment();
+    }
+  }, [openComments]);
+
+  const commentPost = (data) => {
+    axios
+      .post(`${process.env.REACT_APP_API_BASE_URL}/post/${data.id}/comment`, {
+        userId: userDetails.id,
+        comment: data.comment,
+      })
+      .then(function (response) {
+        fetchPost();
+      })
+      .catch(function (err) {
+        toast.error(err.response.data.message, {
+          autoClose: 1000,
+        });
+      });
+  };
+
   return (
-    <div className="bg-[#fafafa] w-full h-full p-5  ">
-         {/* <UserSuggestions/> */}
+    <div className="bg-[#fafafa] w-full h-full p-5 relative ">
+      {openComments && (
+        <CommentSection
+          setOpenComments={setOpenComments}
+          commentPost={commentPost}
+          openComments={openComments}
+        />
+      )}
+
       <div className="block md:hidden relative w-full h-full">
         {viewSection === "Home" && (
           <>
@@ -115,11 +177,16 @@ export default function Home() {
                 {postsData?.map((item, i) => (
                   <div key={i}>
                     <Posts
+                      openComments={openComments}
+                      setOpenComments={setOpenComments}
+                      likePost={likePost}
                       image={item?.user?.profileAvatar}
                       username={item?.user?.userName}
                       createdtime={item?.createdAt}
                       content={item.content}
-                      comment={""}
+                      comment={item.comments.length}
+                      likes={item.likes.length}
+                      postId={item._id}
                     />
                   </div>
                   // <Posts image={item.} username={item.} createdtime={} content={item.content} comment={} />
@@ -129,22 +196,32 @@ export default function Home() {
           </>
         )}
         {viewSection === "Explore" && (
-          <div className="h-full w-full ">
-            <Explore />
+          <div className=" bg-contrast-200 p-4 h-full">
+            <div className="text-lg text-[#000000] font-medium">
+              Suggested for you
+            </div>
+            <div className="mt-4 overflow-y-auto h-full posts ">
+              {totalusers && <Explore usersList={totalusers} />}
+            </div>
           </div>
         )}
         {viewSection === "Create" && (
           <div className="h-full w-full ">
             <CreatePostModal
               mobView={true}
-              image={cookies.user.profileAvatar}
+              image={cookies.user.profilepicture}
               handlecreatepost={handlecreatepost}
             />
           </div>
         )}
         {viewSection === "Notification" && (
-          <div className="h-full w-full ">
-            <Notifications />
+          <div className=" bg-contrast-200 p-4 h-full">
+            <div className="text-lg text-[#000000] font-medium">
+              Notifications
+            </div>
+            <div className="mt-4 overflow-y-auto h-full posts ">
+              <Notifications />
+            </div>
           </div>
         )}
         {viewSection === "Profile" && (
@@ -160,29 +237,33 @@ export default function Home() {
         />
       </div>
       <div className="hidden md:block  h-full">
-        <div className="flex gap-5 h-full">
-          <div className="w-[400px] h-full bg-contrast-200">
+        <div className="flex gap-5 h-full w-full">
+          <div className="w-[20%] h-full bg-contrast-200">
             {userDetails && <Profile data={userDetails} />}
           </div>
-          <div className="w-full h-full overflow-hidden">
+          <div className="w-[50%] h-full overflow-hidden">
             <div>
               <CreatePostModal
                 mobView={false}
-                image={cookies.user.profileAvatar}
+                image={cookies.user.profilepicture}
                 handlecreatepost={handlecreatepost}
               />
             </div>
             <div className="h-full">
               {postsData && (
-                <div className=" posts h-full w-full overflow-y-auto ">
+                <div className=" posts h-full w-full overflow-y-auto pb-10">
                   {postsData?.map((item, i) => (
                     <div key={i}>
                       <Posts
+                        setOpenComments={setOpenComments}
+                        likePost={likePost}
                         image={item?.user?.profileAvatar}
                         username={item?.user?.userName}
                         createdtime={item?.createdAt}
                         content={item.content}
-                        comment={""}
+                        comment={item.comments.length}
+                        likes={item.likes.length}
+                        postId={item._id}
                       />
                     </div>
                     // <Posts image={item.} username={item.} createdtime={} content={item.content} comment={} />
@@ -191,12 +272,22 @@ export default function Home() {
               )}
             </div>
           </div>
-          <div className="w-[400px] bg-contrast-200">
-            <div>
-              <Explore />
+          <div className="w-[30%] ">
+            <div className="mt-4 bg-contrast-200 p-4">
+              <div className="text-lg text-[#000000] font-medium">
+                Suggested for you
+              </div>
+              <div className="mt-4 overflow-y-auto h-[200px] posts ">
+                <Explore usersList={totalusers} />
+              </div>
             </div>
-            <div>
-              <Notifications />
+            <div className="mt-4 bg-contrast-200 p-4 ">
+              <div className="text-lg text-[#000000] font-medium">
+                Notifications
+              </div>
+              <div className="mt-4 overflow-y-auto h-[200px] posts ">
+                <Notifications />
+              </div>
             </div>
           </div>
         </div>
