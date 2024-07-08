@@ -60,13 +60,12 @@ export default function CommentSection(props) {
               </div>
             ) : (
               <div className="flex justify-center py-5 text-md text-gray-200 font-medium">
-                {" "}
                 No Commments Found
               </div>
             )}
           </div>
         ) : (
-          <div className="flex justify-center">
+          <div className="flex justify-center py-5">
             <Loader text={"Loading Comments...."} />
           </div>
         )}

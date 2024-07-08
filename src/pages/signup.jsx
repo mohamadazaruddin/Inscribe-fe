@@ -150,6 +150,7 @@ export default function Signup() {
                 placeholder="About..."
                 value={bio}
                 rows={5}
+                required
                 onChange={(e) => setBio(e.target.value)}
               />
             </div>

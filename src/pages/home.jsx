@@ -22,11 +22,13 @@ import Loader from "../components/Loader";
 export default function Home() {
   const [viewSection, setViewSection] = React.useState("Home");
   const [userDetails, setUserDetails] = React.useState();
+  const [notifications, setNotifications] = React.useState();
   const [postsData, setPostsData] = React.useState();
   const [totalusers, setTotalUsers] = React.useState();
   const [openComments, setOpenComments] = React.useState("");
   const [openlikes, setOpenLikes] = React.useState("");
   const [postComments, setPostComments] = React.useState();
+  const [postLikes, setPostLikes] = React.useState();
   const [cookies, remove] = useCookies(["user"]);
   const { logout } = useContext(AuthContext);
   const navItems = [
@@ -55,12 +57,14 @@ export default function Home() {
 
   const fetchExploreData = () => {
     axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}/users`)
+      .get(
+        `${process.env.REACT_APP_API_BASE_URL}/users/${cookies.user.id}/suggestions`
+      )
       .then(function (response) {
         setTotalUsers(response.data);
       })
       .catch(function (err) {
-        toast.error(err.response.data.message, {
+        toast.error(err?.response?.data?.message, {
           autoClose: 1000,
         });
       });
@@ -72,7 +76,7 @@ export default function Home() {
         setUserDetails(response.data);
       })
       .catch(function (err) {
-        if (err.response.status == 403) {
+        if (err?.response?.status == 403) {
           logout();
         }
       });
@@ -90,6 +94,22 @@ export default function Home() {
         });
       });
   };
+
+  const fetchNotifications = () => {
+    axios
+      .get(
+        `${process.env.REACT_APP_API_BASE_URL}/users/${cookies.user.id}/notifications`
+      )
+      .then(function (response) {
+        setNotifications(response.data);
+      })
+      .catch(function (err) {
+        toast.error(err.response.data.message, {
+          autoClose: 1000,
+        });
+      });
+  };
+
   const handlecreatepost = (data) => {
     axios
       .post(`${process.env.REACT_APP_API_BASE_URL}/post/${userDetails.id}`, {
@@ -116,6 +136,7 @@ export default function Home() {
       })
       .then(function (response) {
         fetchPost();
+        fetchNotifications();
       })
       .catch(function (err) {
         toast.error(err.response.data.message, {
@@ -128,7 +149,8 @@ export default function Home() {
     axios
       .get(`${process.env.REACT_APP_API_BASE_URL}/post/${openlikes}/like`)
       .then(function (response) {
-        setPostComments(response.data);
+        console.log(response);
+        setPostLikes(response.data);
       })
       .catch(function (err) {
         toast.error(err.response.data.message, {
@@ -170,6 +192,7 @@ export default function Home() {
       .then(function (response) {
         getComment();
         fetchPost();
+        fetchNotifications();
       })
       .catch(function (err) {
         toast.error(err.response.data.message, {
@@ -184,6 +207,7 @@ export default function Home() {
         fetchUserDetails();
         fetchPost();
         fetchExploreData();
+        fetchNotifications();
         // add like
         // get like
         // add follow
@@ -194,6 +218,29 @@ export default function Home() {
 
     return () => clearTimeout(timer); // Clean up the timer
   }, []);
+
+  const handleFollow = (id) => {
+    axios
+      .post(
+        `${process.env.REACT_APP_API_BASE_URL}/users/${userDetails.id}/follow`,
+        {
+          followId: id,
+        }
+      )
+      .then(function (response) {
+        toast.success(response.data.message, {
+          autoClose: 1000,
+        });
+        fetchUserDetails();
+        fetchExploreData();
+      })
+      .catch(function (err) {
+        toast.error(err.response.data.message, {
+          autoClose: 1000,
+        });
+      });
+  };
+
   return (
     <div
       className={"bg-[#fafafa] w-full h-screen p-5 overflow-y-auto relative "}
@@ -211,7 +258,11 @@ export default function Home() {
           )}
 
           {openlikes && (
-            <Likes setOpenLikes={setOpenLikes} openlikes={openlikes} />
+            <Likes
+              setOpenLikes={setOpenLikes}
+              postLikes={postLikes}
+              openlikes={openlikes}
+            />
           )}
 
           <div className="block md:hidden relative w-full h-full">
@@ -231,6 +282,7 @@ export default function Home() {
                           username={item?.user?.userName}
                           createdtime={item?.createdAt}
                           content={item.content}
+                          isLikedbyMe={item.likes.includes(cookies.user.id)}
                           comment={item.comments.length}
                           likes={item.likes.length}
                           postId={item._id}
@@ -248,7 +300,12 @@ export default function Home() {
                   Suggested for you
                 </div>
                 <div className="mt-4 overflow-y-auto h-full posts ">
-                  {totalusers && <Explore usersList={totalusers} />}
+                  {totalusers && (
+                    <Explore
+                      usersList={totalusers}
+                      handleFollow={handleFollow}
+                    />
+                  )}
                 </div>
               </div>
             )}
@@ -267,7 +324,9 @@ export default function Home() {
                   Notifications
                 </div>
                 <div className="mt-4 overflow-y-auto h-full posts ">
-                  <Notifications />
+                  {notifications && notifications.data.length > 0 && (
+                    <Notifications notifications={notifications.data} />
+                  )}
                 </div>
               </div>
             )}
@@ -309,6 +368,7 @@ export default function Home() {
                             likePost={likePost}
                             image={item?.user?.profileAvatar}
                             username={item?.user?.userName}
+                            isLikedbyMe={item.likes.includes(cookies.user.id)}
                             createdtime={item?.createdAt}
                             content={item.content}
                             comment={item.comments.length}
@@ -328,7 +388,10 @@ export default function Home() {
                     Suggested for you
                   </div>
                   <div className="mt-4 overflow-y-auto h-[200px] posts ">
-                    <Explore usersList={totalusers} />
+                    <Explore
+                      handleFollow={handleFollow}
+                      usersList={totalusers}
+                    />
                   </div>
                 </div>
                 <div className="mt-4 bg-contrast-200 p-4 ">
@@ -336,7 +399,9 @@ export default function Home() {
                     Notifications
                   </div>
                   <div className="mt-4 overflow-y-auto h-[200px] posts ">
-                    <Notifications />
+                    {notifications && notifications.data.length > 0 && (
+                      <Notifications notifications={notifications.data} />
+                    )}
                   </div>
                 </div>
               </div>

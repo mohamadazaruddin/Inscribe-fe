@@ -1,7 +1,7 @@
 import React from "react";
 import LikeIcon from "./Icons/LikeIcon";
 import Comment from "./Icons/Comment";
-import ShareIcon from "./Icons/ShareIcon";
+// import ShareIcon from "./Icons/ShareIcon";
 import { dateFormatter } from "../utils/dateFormatter";
 export default function Posts(props) {
   return (
@@ -26,12 +26,16 @@ export default function Posts(props) {
         </div>
         <div className="flex px-5 items-center justify-start py-2 gap-3">
           <div
-            className=" justify-center flex rounded-full gap-2 items-center p-2 shadow-sm border-b border-primary-200 cursor-pointer"
+            className={`${
+              props.isLikedbyMe
+                ? "bg-primary-500 text-[#ffffff]"
+                : "bg-contrast-200 text-[#374151]"
+            } justify-center flex rounded-full gap-2 items-center p-2 shadow-sm border-b border-primary-200 cursor-pointer`}
             onClick={() => {
               props.likePost(props.postId);
             }}
           >
-            <LikeIcon height="18px" width="18px" color="#374151" />
+            <LikeIcon height="18px" width="18px" />
           </div>
           <div
             className="text-sm text-black cursor-pointer"
