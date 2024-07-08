@@ -1,5 +1,6 @@
 import React, { createContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { ToastContainer, toast } from "react-toastify";
@@ -17,15 +18,16 @@ export const AuthProvider = ({ children }) => {
         password: data.password,
       })
       .then(function (response) {
+        navigate("/home");
         setCookie("user", response.data.loggedInuser, {
           path: "/",
           maxAge: 18000,
         });
         setCookie("token", response.data.token, { path: "/", maxAge: 18000 });
-        navigate("/home");
-        toast.success(`Login Successfully`, {
-          autoClose: 3000,
-        });
+
+        // toast.success(`Login Successfully`, {
+        //   autoClose: 3000,
+        // });
       })
       .catch(function (err) {
         toast.error(`${err.response.data.message}`, {

@@ -17,6 +17,7 @@ import axios from "axios";
 import CommentSection from "../components/CommentSection";
 import { Navigate } from "react-router-dom";
 import Likes from "../components/Likes";
+import Loader from "../components/Loader";
 
 export default function Home() {
   const [viewSection, setViewSection] = React.useState("Home");
@@ -26,7 +27,7 @@ export default function Home() {
   const [openComments, setOpenComments] = React.useState("");
   const [openlikes, setOpenLikes] = React.useState("");
   const [postComments, setPostComments] = React.useState();
-  const [cookies] = useCookies(["user"]);
+  const [cookies, remove] = useCookies(["user"]);
   const { logout } = useContext(AuthContext);
   const navItems = [
     {
@@ -52,18 +53,6 @@ export default function Home() {
     },
   ];
 
-  useEffect(() => {
-    if (cookies.user) {
-      fetchUserDetails();
-      fetchPost();
-      fetchExploreData();
-      // add like
-      // get like
-      // add follow
-    } else {
-      Navigate("/login");
-    }
-  }, []);
   const fetchExploreData = () => {
     axios
       .get(`${process.env.REACT_APP_API_BASE_URL}/users`)
@@ -71,7 +60,9 @@ export default function Home() {
         setTotalUsers(response.data);
       })
       .catch(function (err) {
-        console.log(err, "err");
+        toast.error(err.response.data.message, {
+          autoClose: 1000,
+        });
       });
   };
   const fetchUserDetails = () => {
@@ -81,7 +72,9 @@ export default function Home() {
         setUserDetails(response.data);
       })
       .catch(function (err) {
-        console.log(err, "err");
+        if (err.response.status == 403) {
+          logout();
+        }
       });
   };
 
@@ -92,11 +85,12 @@ export default function Home() {
         setPostsData(response.data.postContent);
       })
       .catch(function (err) {
-        console.log(err, "err");
+        toast.error(err.response.data.message, {
+          autoClose: 1000,
+        });
       });
   };
   const handlecreatepost = (data) => {
-    console.log(data);
     axios
       .post(`${process.env.REACT_APP_API_BASE_URL}/post/${userDetails.id}`, {
         content: data,
@@ -137,7 +131,9 @@ export default function Home() {
         setPostComments(response.data);
       })
       .catch(function (err) {
-        console.log(err, "err");
+        toast.error(err.response.data.message, {
+          autoClose: 1000,
+        });
       });
   };
   const getComment = () => {
@@ -147,17 +143,23 @@ export default function Home() {
         setPostComments(response.data);
       })
       .catch(function (err) {
-        console.log(err, "err");
+        toast.error(err.response.data.message, {
+          autoClose: 1000,
+        });
       });
   };
 
   useEffect(() => {
-    getComment();
-  }, [openComments.length > 0]);
+    if (openComments.length > 20) {
+      getComment();
+    }
+  }, [openComments]);
 
   useEffect(() => {
-    getLikes();
-  }, [openlikes.length > 0]);
+    if (openlikes.length > 20) {
+      getLikes();
+    }
+  }, [openlikes]);
 
   const commentPost = (data) => {
     axios
@@ -176,149 +178,178 @@ export default function Home() {
       });
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (cookies.user) {
+        fetchUserDetails();
+        fetchPost();
+        fetchExploreData();
+        // add like
+        // get like
+        // add follow
+      } else {
+        Navigate("/login");
+      }
+    }, [2000]);
+
+    return () => clearTimeout(timer); // Clean up the timer
+  }, []);
   return (
-    <div className={"bg-[#fafafa] w-full h-full p-5 relative "}>
-      {openComments && (
-        <CommentSection
-          setOpenComments={setOpenComments}
-          commentPost={commentPost}
-          postComments={postComments}
-          openComments={openComments}
-          userDetails={userDetails}
-        />
-      )}
+    <div
+      className={"bg-[#fafafa] w-full h-screen p-5 overflow-y-auto relative "}
+    >
+      {userDetails && postsData && totalusers ? (
+        <>
+          {openComments && (
+            <CommentSection
+              setOpenComments={setOpenComments}
+              commentPost={commentPost}
+              postComments={postComments}
+              openComments={openComments}
+              userDetails={userDetails}
+            />
+          )}
 
-      {openlikes && <Likes setOpenLikes={setOpenLikes} openlikes={openlikes} />}
+          {openlikes && (
+            <Likes setOpenLikes={setOpenLikes} openlikes={openlikes} />
+          )}
 
-      <div className="block md:hidden relative w-full h-full">
-        {viewSection === "Home" && (
-          <>
-            {postsData && (
-              <div className=" posts h-full w-full overflow-y-auto ">
-                {postsData?.map((item, i) => (
-                  <div key={i}>
-                    <Posts
-                      openComments={openComments}
-                      setOpenComments={setOpenComments}
-                      setOpenLikes={setOpenLikes}
-                      openlikes={openlikes}
-                      likePost={likePost}
-                      image={item?.user?.profileAvatar}
-                      username={item?.user?.userName}
-                      createdtime={item?.createdAt}
-                      content={item.content}
-                      comment={item.comments.length}
-                      likes={item.likes.length}
-                      postId={item._id}
-                    />
+          <div className="block md:hidden relative w-full h-full">
+            {viewSection === "Home" && (
+              <>
+                {postsData && (
+                  <div className=" posts h-full w-full overflow-y-auto ">
+                    {postsData?.map((item, i) => (
+                      <div key={i}>
+                        <Posts
+                          openComments={openComments}
+                          setOpenComments={setOpenComments}
+                          setOpenLikes={setOpenLikes}
+                          openlikes={openlikes}
+                          likePost={likePost}
+                          image={item?.user?.profileAvatar}
+                          username={item?.user?.userName}
+                          createdtime={item?.createdAt}
+                          content={item.content}
+                          comment={item.comments.length}
+                          likes={item.likes.length}
+                          postId={item._id}
+                        />
+                      </div>
+                      // <Posts image={item.} username={item.} createdtime={} content={item.content} comment={} />
+                    ))}
                   </div>
-                  // <Posts image={item.} username={item.} createdtime={} content={item.content} comment={} />
-                ))}
+                )}
+              </>
+            )}
+            {viewSection === "Explore" && (
+              <div className=" bg-contrast-200 p-4 h-full">
+                <div className="text-lg text-[#000000] font-medium">
+                  Suggested for you
+                </div>
+                <div className="mt-4 overflow-y-auto h-full posts ">
+                  {totalusers && <Explore usersList={totalusers} />}
+                </div>
               </div>
             )}
-          </>
-        )}
-        {viewSection === "Explore" && (
-          <div className=" bg-contrast-200 p-4 h-full">
-            <div className="text-lg text-[#000000] font-medium">
-              Suggested for you
-            </div>
-            <div className="mt-4 overflow-y-auto h-full posts ">
-              {totalusers && <Explore usersList={totalusers} />}
-            </div>
-          </div>
-        )}
-        {viewSection === "Create" && (
-          <div className="h-full w-full ">
-            <CreatePostModal
-              mobView={true}
-              image={cookies.user.profilepicture}
-              handlecreatepost={handlecreatepost}
+            {viewSection === "Create" && (
+              <div className="h-full w-full ">
+                <CreatePostModal
+                  mobView={true}
+                  image={cookies.user.profilepicture}
+                  handlecreatepost={handlecreatepost}
+                />
+              </div>
+            )}
+            {viewSection === "Notification" && (
+              <div className=" bg-contrast-200 p-4 h-full">
+                <div className="text-lg text-[#000000] font-medium">
+                  Notifications
+                </div>
+                <div className="mt-4 overflow-y-auto h-full posts ">
+                  <Notifications />
+                </div>
+              </div>
+            )}
+            {viewSection === "Profile" && (
+              <div className="h-full w-full ">
+                {userDetails && <Profile data={userDetails} />}
+              </div>
+            )}
+
+            <BottomNav
+              navItems={navItems}
+              viewSection={viewSection}
+              setViewSection={setViewSection}
             />
           </div>
-        )}
-        {viewSection === "Notification" && (
-          <div className=" bg-contrast-200 p-4 h-full">
-            <div className="text-lg text-[#000000] font-medium">
-              Notifications
-            </div>
-            <div className="mt-4 overflow-y-auto h-full posts ">
-              <Notifications />
-            </div>
-          </div>
-        )}
-        {viewSection === "Profile" && (
-          <div className="h-full w-full ">
-            {userDetails && <Profile data={userDetails} />}
-          </div>
-        )}
-
-        <BottomNav
-          navItems={navItems}
-          viewSection={viewSection}
-          setViewSection={setViewSection}
-        />
-      </div>
-      <div className="hidden md:block  h-full">
-        <div className="flex gap-5 h-full w-full">
-          <div className="w-[20%] h-full bg-contrast-200">
-            {userDetails && <Profile data={userDetails} />}
-          </div>
-          <div className="w-[50%] h-full overflow-hidden">
-            <div>
-              <CreatePostModal
-                mobView={false}
-                image={cookies.user.profilepicture}
-                handlecreatepost={handlecreatepost}
-              />
-            </div>
-            <div className="h-full">
-              {postsData && (
-                <div className=" posts h-full w-full overflow-y-auto pb-10">
-                  {postsData?.map((item, i) => (
-                    <div key={i}>
-                      <Posts
-                        openComments={openComments}
-                        setOpenComments={setOpenComments}
-                        setOpenLikes={setOpenLikes}
-                        openlikes={openlikes}
-                        likePost={likePost}
-                        image={item?.user?.profileAvatar}
-                        username={item?.user?.userName}
-                        createdtime={item?.createdAt}
-                        content={item.content}
-                        comment={item.comments.length}
-                        likes={item.likes.length}
-                        postId={item._id}
-                      />
-                    </div>
-                    // <Posts image={item.} username={item.} createdtime={} content={item.content} comment={} />
-                  ))}
+          <div className="hidden md:block  h-full">
+            <div className="flex gap-5 h-full w-full">
+              <div className="w-[20%] h-full bg-contrast-200">
+                {userDetails && <Profile data={userDetails} />}
+              </div>
+              <div className="w-[50%] h-full overflow-hidden">
+                <div>
+                  <CreatePostModal
+                    mobView={false}
+                    image={cookies.user.profilepicture}
+                    handlecreatepost={handlecreatepost}
+                  />
                 </div>
-              )}
+                <div className="h-full">
+                  {postsData && (
+                    <div className=" posts h-full w-full overflow-y-auto pb-10">
+                      {postsData?.map((item, i) => (
+                        <div key={i}>
+                          <Posts
+                            openComments={openComments}
+                            setOpenComments={setOpenComments}
+                            setOpenLikes={setOpenLikes}
+                            openlikes={openlikes}
+                            likePost={likePost}
+                            image={item?.user?.profileAvatar}
+                            username={item?.user?.userName}
+                            createdtime={item?.createdAt}
+                            content={item.content}
+                            comment={item.comments.length}
+                            likes={item.likes.length}
+                            postId={item._id}
+                          />
+                        </div>
+                        // <Posts image={item.} username={item.} createdtime={} content={item.content} comment={} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="w-[30%] ">
+                <div className="mt-4 bg-contrast-200 p-4">
+                  <div className="text-lg text-[#000000] font-medium">
+                    Suggested for you
+                  </div>
+                  <div className="mt-4 overflow-y-auto h-[200px] posts ">
+                    <Explore usersList={totalusers} />
+                  </div>
+                </div>
+                <div className="mt-4 bg-contrast-200 p-4 ">
+                  <div className="text-lg text-[#000000] font-medium">
+                    Notifications
+                  </div>
+                  <div className="mt-4 overflow-y-auto h-[200px] posts ">
+                    <Notifications />
+                  </div>
+                </div>
+              </div>
             </div>
+            {/* <button onClick={logout}>logout</button> */}
           </div>
-          <div className="w-[30%] ">
-            <div className="mt-4 bg-contrast-200 p-4">
-              <div className="text-lg text-[#000000] font-medium">
-                Suggested for you
-              </div>
-              <div className="mt-4 overflow-y-auto h-[200px] posts ">
-                <Explore usersList={totalusers} />
-              </div>
-            </div>
-            <div className="mt-4 bg-contrast-200 p-4 ">
-              <div className="text-lg text-[#000000] font-medium">
-                Notifications
-              </div>
-              <div className="mt-4 overflow-y-auto h-[200px] posts ">
-                <Notifications />
-              </div>
-            </div>
-          </div>
+        </>
+      ) : (
+        <div className="h-full w-full flex justify-center items-center">
+          {" "}
+          <Loader />
         </div>
-        {/* <button onClick={logout}>logout</button> */}
-      </div>
+      )}{" "}
     </div>
   );
 }

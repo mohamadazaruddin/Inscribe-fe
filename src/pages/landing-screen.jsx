@@ -5,17 +5,17 @@ export default function LandingPage() {
   return cookies.token ? (
     <Navigate to="/home" />
   ) : (
-    <div className="bg-white h-full bg-[url('../../public/assets/images/landing.png')] bg-center bg-cover bg-no-repeat flex flex-col justify-end px-5 py-10 ">
+    <div className="bg-white h-full bg-[url('../../public/assets/images/landing.png')] bg-center bg-cover bg-no-repeat flex flex-col justify-end md:justify-center px-5 py-10 ">
       <div className="mx-auto text-center">
-        <div className="text-2xl text-black font-medium">
+        <div className="text-2xl text-black font-medium md:text-[40px]">
           Share Your Thoughts
         </div>
-        <div className="text-sm text-primary-400 mt-4">
+        <div className="text-sm text-primary-400 mt-4 md:text-lg">
           Create And Share Your Thoughts Without <br />
           Sharing your Identity
         </div>
       </div>
-      <div className="mt-8 w-full">
+      <div className="mt-8 w-full md:w-[250px] mx-auto">
         <Link
           to="/signup"
           className="block text-center bg-primary-500 rounded-full py-2 text-md font-medium text-contrast-200"

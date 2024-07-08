@@ -17,7 +17,7 @@ export default function CommentSection(props) {
         >
           <CancelIcon height="32px" width="32px" />
         </div>
-        {props.postComments && props.postComments.post.comments.length > 0 ? (
+        {props.postComments ? (
           <div className="mt-1">
             <div className="px-5 pb-2 flex gap-4 place-items-center border-b border-primary-200">
               <img
@@ -39,7 +39,7 @@ export default function CommentSection(props) {
               {props.postComments.post.content}
             </div>
 
-            {props.postComments.post.comments.length > 0 && (
+            {props.postComments.post.comments.length > 0 ? (
               <div className="py-2 border-b border-primary-200 pl -4">
                 {props.postComments.post.comments.map((item, i) => (
                   <div className="flex items-center mt-2">
@@ -57,6 +57,11 @@ export default function CommentSection(props) {
                     </div>
                   </div>
                 ))}
+              </div>
+            ) : (
+              <div className="flex justify-center py-5 text-md text-gray-200 font-medium">
+                {" "}
+                No Commments Found
               </div>
             )}
           </div>

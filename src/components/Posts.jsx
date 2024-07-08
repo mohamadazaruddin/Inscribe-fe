@@ -48,9 +48,9 @@ export default function Posts(props) {
               {props.comment}
             </div>
           </div>
-          <div className=" justify-center flex rounded-full items-center p-2 border-b border-primary-200 ">
+          {/* <div className=" justify-center flex rounded-full items-center p-2 border-b border-primary-200 ">
             <ShareIcon height="18px" width="18px" color="#374151" />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

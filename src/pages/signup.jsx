@@ -118,7 +118,7 @@ export default function Signup() {
                 className="absolute top-[35px] right-4"
                 onClick={() => setViewpass(!viewpass)}
               >
-                view
+                {!viewpass ? "hide" : "show"}
               </div>
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
