@@ -33,7 +33,12 @@ export default function Posts(props) {
           >
             <LikeIcon height="18px" width="18px" color="#374151" />
           </div>
-          <div className="text-sm text-black cursor-pointer">{props.likes}</div>
+          <div
+            className="text-sm text-black cursor-pointer"
+            onClick={() => props.setOpenLikes(props.postId)}
+          >
+            {props.likes}
+          </div>
           <div
             className=" justify-center flex gap-2 rounded-full items-center p-2 shadow-sm border-b border-primary-200 text-[#374151]"
             onClick={() => props.setOpenComments(props.postId)}

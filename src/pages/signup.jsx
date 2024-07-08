@@ -22,7 +22,7 @@ export default function Signup() {
         bio: bio,
       })
       .then(function (response) {
-        toast.success(response.message, {
+        toast.success("Account Created Successfully", {
           autoClose: 1000,
         });
         const user = {

@@ -15,6 +15,8 @@ import AuthContext from "../services/context/AuthContext";
 import { toast } from "react-toastify";
 import axios from "axios";
 import CommentSection from "../components/CommentSection";
+import { Navigate } from "react-router-dom";
+import Likes from "../components/Likes";
 
 export default function Home() {
   const [viewSection, setViewSection] = React.useState("Home");
@@ -22,7 +24,8 @@ export default function Home() {
   const [postsData, setPostsData] = React.useState();
   const [totalusers, setTotalUsers] = React.useState();
   const [openComments, setOpenComments] = React.useState("");
-
+  const [openlikes, setOpenLikes] = React.useState("");
+  const [postComments, setPostComments] = React.useState();
   const [cookies] = useCookies(["user"]);
   const { logout } = useContext(AuthContext);
   const navItems = [
@@ -49,6 +52,18 @@ export default function Home() {
     },
   ];
 
+  useEffect(() => {
+    if (cookies.user) {
+      fetchUserDetails();
+      fetchPost();
+      fetchExploreData();
+      // add like
+      // get like
+      // add follow
+    } else {
+      Navigate("/login");
+    }
+  }, []);
   const fetchExploreData = () => {
     axios
       .get(`${process.env.REACT_APP_API_BASE_URL}/users`)
@@ -81,6 +96,7 @@ export default function Home() {
       });
   };
   const handlecreatepost = (data) => {
+    console.log(data);
     axios
       .post(`${process.env.REACT_APP_API_BASE_URL}/post/${userDetails.id}`, {
         content: data,
@@ -98,18 +114,6 @@ export default function Home() {
         });
       });
   };
-  useEffect(() => {
-    if (cookies.user) {
-      fetchUserDetails();
-      fetchPost();
-      fetchExploreData();
-      // add like
-      // get like
-      // add comment
-      // get comment
-      // add follow
-    }
-  }, []);
 
   const likePost = (id) => {
     axios
@@ -126,11 +130,21 @@ export default function Home() {
       });
   };
 
+  const getLikes = () => {
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/post/${openlikes}/like`)
+      .then(function (response) {
+        setPostComments(response.data);
+      })
+      .catch(function (err) {
+        console.log(err, "err");
+      });
+  };
   const getComment = () => {
     axios
       .get(`${process.env.REACT_APP_API_BASE_URL}/post/${openComments}/comment`)
       .then(function (response) {
-        console.log(response, "comments");
+        setPostComments(response.data);
       })
       .catch(function (err) {
         console.log(err, "err");
@@ -138,10 +152,12 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (openComments.length > 0) {
-      getComment();
-    }
-  }, [openComments]);
+    getComment();
+  }, [openComments.length > 0]);
+
+  useEffect(() => {
+    getLikes();
+  }, [openlikes.length > 0]);
 
   const commentPost = (data) => {
     axios
@@ -150,6 +166,7 @@ export default function Home() {
         comment: data.comment,
       })
       .then(function (response) {
+        getComment();
         fetchPost();
       })
       .catch(function (err) {
@@ -160,14 +177,18 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-[#fafafa] w-full h-full p-5 relative ">
+    <div className={"bg-[#fafafa] w-full h-full p-5 relative "}>
       {openComments && (
         <CommentSection
           setOpenComments={setOpenComments}
           commentPost={commentPost}
+          postComments={postComments}
           openComments={openComments}
+          userDetails={userDetails}
         />
       )}
+
+      {openlikes && <Likes setOpenLikes={setOpenLikes} openlikes={openlikes} />}
 
       <div className="block md:hidden relative w-full h-full">
         {viewSection === "Home" && (
@@ -179,6 +200,8 @@ export default function Home() {
                     <Posts
                       openComments={openComments}
                       setOpenComments={setOpenComments}
+                      setOpenLikes={setOpenLikes}
+                      openlikes={openlikes}
                       likePost={likePost}
                       image={item?.user?.profileAvatar}
                       username={item?.user?.userName}
@@ -255,7 +278,10 @@ export default function Home() {
                   {postsData?.map((item, i) => (
                     <div key={i}>
                       <Posts
+                        openComments={openComments}
                         setOpenComments={setOpenComments}
+                        setOpenLikes={setOpenLikes}
+                        openlikes={openlikes}
                         likePost={likePost}
                         image={item?.user?.profileAvatar}
                         username={item?.user?.userName}

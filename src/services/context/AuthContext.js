@@ -11,30 +11,27 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const login = async (data) => {
-    try {
-      axios
-        .post(`${process.env.REACT_APP_API_BASE_URL}/users/login`, {
-          username: data.username,
-          password: data.password,
-        })
-        .then(function (response) {
-          setCookie("user", response.data.loggedInuser, {
-            path: "/",
-            maxAge: 18000,
-          });
-          setCookie("token", response.data.token, { path: "/" });
-          toast.success(response.message, {
-            autoClose: 1000,
-          });
-          navigate("/home");
-          return;
-        })
-        .catch(function (err) {
-          toast.error(`${err.response.data.message}`, {
-            autoClose: 3000,
-          });
+    axios
+      .post(`${process.env.REACT_APP_API_BASE_URL}/users/login`, {
+        username: data.username,
+        password: data.password,
+      })
+      .then(function (response) {
+        setCookie("user", response.data.loggedInuser, {
+          path: "/",
+          maxAge: 18000,
         });
-    } catch (err) {}
+        setCookie("token", response.data.token, { path: "/", maxAge: 18000 });
+        navigate("/home");
+        toast.success(`Login Successfully`, {
+          autoClose: 3000,
+        });
+      })
+      .catch(function (err) {
+        toast.error(`${err.response.data.message}`, {
+          autoClose: 3000,
+        });
+      });
   };
 
   const logout = () => {
