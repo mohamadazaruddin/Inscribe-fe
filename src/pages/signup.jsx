@@ -120,7 +120,7 @@ export default function Signup() {
                 className="absolute top-[35px] right-4"
                 onClick={() => setViewpass(!viewpass)}
               >
-                {!viewpass ? "hide" : "show"}
+                {viewpass ? "hide" : "show"}
               </div>
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
@@ -131,7 +131,7 @@ export default function Signup() {
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="password"
-                type={viewpass ? "password" : "text"}
+                type={!viewpass ? "password" : "text"}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
