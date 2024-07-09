@@ -18,7 +18,6 @@ import CommentSection from "../components/CommentSection";
 import { Navigate } from "react-router-dom";
 import Likes from "../components/Likes";
 import Loader from "../components/Loader";
-import Categories from "../components/Categories";
 
 export default function Home() {
   const [viewSection, setViewSection] = React.useState("Home");
@@ -89,9 +88,9 @@ export default function Home() {
       .get(`${process.env.REACT_APP_API_BASE_URL}/post?query=newest`)
       .then(function (response) {
         setPostsData(response.data.postContent);
+        fetchNotifications();
       })
       .catch(function (err) {
-        console.log(err, "err");
         toast.error(err.message || err.response.data.message, {
           autoClose: 1000,
         });
@@ -123,6 +122,7 @@ export default function Home() {
           autoClose: 1000,
         });
         setViewSection("Home");
+        fetchNotifications();
         fetchPost();
       })
       .catch(function (err) {
@@ -233,6 +233,7 @@ export default function Home() {
         });
         fetchUserDetails();
         fetchExploreData();
+        fetchNotifications();
       })
       .catch(function (err) {
         toast.error(err.response.data.message, {
@@ -269,7 +270,7 @@ export default function Home() {
             {viewSection === "Home" && (
               <>
                 {postsData && (
-                  <div className=" posts h-full w-full overflow-y-auto ">
+                  <div className=" posts h-full w-full overflow-y-auto pb-[100px]">
                     {postsData?.map((item, i) => (
                       <div key={i}>
                         <Posts
@@ -337,7 +338,7 @@ export default function Home() {
           </div>
           <div className="hidden md:block  h-full">
             <div className="flex gap-5 h-full w-full">
-              <div className="w-[20%] h-full bg-contrast-200">
+              <div className="w-[20%]  bg-contrast-200">
                 {userDetails && <Profile data={userDetails} />}
               </div>
               <div className="w-[50%] h-full overflow-hidden">
@@ -350,7 +351,7 @@ export default function Home() {
                 </div>
                 <div className="h-full">
                   {postsData && (
-                    <div className=" posts h-full w-full overflow-y-auto pb-10">
+                    <div className=" posts h-full w-full overflow-y-auto pb-[230px]">
                       {postsData?.map((item, i) => (
                         <div key={i}>
                           <Posts

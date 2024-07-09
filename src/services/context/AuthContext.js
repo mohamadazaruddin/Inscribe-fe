@@ -17,8 +17,7 @@ export const AuthProvider = ({ children }) => {
         password: data.password,
       })
       .then(function (response) {
-        if (response) {
-          navigate("/home");
+        if (response.data) {
           setCookie("user", response.data.loggedInuser, {
             path: "/",
             maxAge: 18000,
@@ -27,6 +26,7 @@ export const AuthProvider = ({ children }) => {
             path: "/",
             maxAge: 18000,
           });
+          window.location.href = "/home";
         }
       })
 
@@ -41,6 +41,9 @@ export const AuthProvider = ({ children }) => {
     removeCookie(["user"]);
     removeCookie(["token"]);
     navigate("/login");
+    toast.success(`Logout Successfully`, {
+      autoClose: 1000,
+    });
   };
 
   const value = {

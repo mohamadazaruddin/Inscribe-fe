@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { dateFormatter } from "../utils/dateFormatter";
 import User from "./User/User";
 import CancelIcon from "./Icons/CancelIcon";
-
+import AuthContext from "../services/context/AuthContext";
 export default function Profile({ data }) {
+  const { logout } = useContext(AuthContext);
   const FollowingList = ({ list }) => {
-    console.log(list);
     return (
       <>
         <div className="bg-[#00000027] absolute top-0 left-0 right-0 bottom-0 z-10 h-full w-full"></div>
@@ -39,10 +39,10 @@ export default function Profile({ data }) {
     view: "",
   });
   return (
-    <div className="p-4 bg-contrast-200">
+    <div className="p-4 bg-contrast-200 h-full relative">
       {showList?.data.length > 0 && <FollowingList list={showList} />}
-      <div className="mt-10 flex flex-col justify-between h-full items-center">
-        <div className="text-center w-full">
+      <div className="mt-10 flex flex-col justify-between  items-center">
+        <div className="text-center w-full mb-10">
           <img
             src={`/assets/images/bitmoji/${data.profilepicture}`}
             alt="profile img"
@@ -94,6 +94,15 @@ export default function Profile({ data }) {
             <p className="text-md font-medium">About</p>
             <p className="text-sm text-gray-200 mt-1">{data.bio}</p>
           </div>
+        </div>
+
+        <div className="flex items-center justify-center md:absolute left-[50%] md:bottom-5 md:translate-x-[-50%] ">
+          <button
+            className="w-full bg-primary-200 py-2 px-5 rounded-md font-medium"
+            onClick={logout}
+          >
+            Logout
+          </button>
         </div>
       </div>
     </div>

@@ -22,14 +22,13 @@ export default function Signup() {
         bio: bio,
       })
       .then(function (response) {
+        login({
+          username: username,
+          password: password,
+        });
         toast.success("Account Created Successfully", {
           autoClose: 1000,
         });
-        const user = {
-          username: username,
-          password: password,
-        };
-        login(user);
       })
       .catch(function (err) {
         toast.error(`${err.response.data.message}`, {
