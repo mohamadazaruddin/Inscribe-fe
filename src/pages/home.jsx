@@ -18,6 +18,7 @@ import CommentSection from "../components/CommentSection";
 import { Navigate } from "react-router-dom";
 import Likes from "../components/Likes";
 import Loader from "../components/Loader";
+import Categories from "../components/Categories";
 
 export default function Home() {
   const [viewSection, setViewSection] = React.useState("Home");
@@ -27,6 +28,7 @@ export default function Home() {
   const [totalusers, setTotalUsers] = React.useState();
   const [openComments, setOpenComments] = React.useState("");
   const [openlikes, setOpenLikes] = React.useState("");
+  // const [category, setCategory] = React.useState("newest");
   const [postComments, setPostComments] = React.useState();
   const [postLikes, setPostLikes] = React.useState();
   const [cookies, remove] = useCookies(["user"]);
@@ -89,7 +91,8 @@ export default function Home() {
         setPostsData(response.data.postContent);
       })
       .catch(function (err) {
-        toast.error(err.response.data.message, {
+        console.log(err, "err");
+        toast.error(err.message || err.response.data.message, {
           autoClose: 1000,
         });
       });
@@ -208,9 +211,6 @@ export default function Home() {
         fetchPost();
         fetchExploreData();
         fetchNotifications();
-        // add like
-        // get like
-        // add follow
       } else {
         Navigate("/login");
       }
@@ -280,9 +280,9 @@ export default function Home() {
                           likePost={likePost}
                           image={item?.user?.profileAvatar}
                           username={item?.user?.userName}
+                          isLikedbyMe={item.likes.includes(cookies.user.id)}
                           createdtime={item?.createdAt}
                           content={item.content}
-                          isLikedbyMe={item.likes.includes(cookies.user.id)}
                           comment={item.comments.length}
                           likes={item.likes.length}
                           postId={item._id}
@@ -300,12 +300,7 @@ export default function Home() {
                   Suggested for you
                 </div>
                 <div className="mt-4 overflow-y-auto h-full posts ">
-                  {totalusers && (
-                    <Explore
-                      usersList={totalusers}
-                      handleFollow={handleFollow}
-                    />
-                  )}
+                  <Explore handleFollow={handleFollow} usersList={totalusers} />
                 </div>
               </div>
             )}
@@ -324,9 +319,7 @@ export default function Home() {
                   Notifications
                 </div>
                 <div className="mt-4 overflow-y-auto h-full posts ">
-                  {notifications && notifications.data.length > 0 && (
-                    <Notifications notifications={notifications.data} />
-                  )}
+                  <Notifications notifications={notifications?.data} />
                 </div>
               </div>
             )}
@@ -348,7 +341,7 @@ export default function Home() {
                 {userDetails && <Profile data={userDetails} />}
               </div>
               <div className="w-[50%] h-full overflow-hidden">
-                <div>
+                <div className="mt-4">
                   <CreatePostModal
                     mobView={false}
                     image={cookies.user.profilepicture}
@@ -399,9 +392,7 @@ export default function Home() {
                     Notifications
                   </div>
                   <div className="mt-4 overflow-y-auto h-[200px] posts ">
-                    {notifications && notifications.data.length > 0 && (
-                      <Notifications notifications={notifications.data} />
-                    )}
+                    <Notifications notifications={notifications?.data} />
                   </div>
                 </div>
               </div>

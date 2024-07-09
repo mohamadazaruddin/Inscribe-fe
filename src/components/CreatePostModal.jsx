@@ -7,12 +7,12 @@ export default function CreatePostModal(props) {
       <div
         className={`w-full ${
           props.mobView
-            ? "absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-5"
+            ? "absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-4"
             : ""
         }  bg-contrast-200 shadow-md rounded-lg p-4 `}
       >
         {props.mobView && (
-          <div className="text-lg text-center font-medium">Create a Post</div>
+          <div className="text-md text-center font-medium">Create a Post</div>
         )}
         <form
           onSubmit={(e) => {
@@ -33,7 +33,7 @@ export default function CreatePostModal(props) {
               style={{ resize: "none" }}
               className="shadow appearance-none border rounded w-full py-2 px-3  text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-primary-200 border-primary-500 placeholder:text-primary-500"
               id="username"
-              rows={5}
+              rows={4}
               type="text"
               placeholder="Share your thoughts"
               value={createPost}
