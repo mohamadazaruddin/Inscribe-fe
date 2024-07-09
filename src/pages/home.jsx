@@ -309,6 +309,7 @@ export default function Home() {
               <div className="h-full w-full ">
                 <CreatePostModal
                   mobView={true}
+                  setViewSection={setViewSection}
                   image={cookies.user.profilepicture}
                   handlecreatepost={handlecreatepost}
                 />
@@ -325,7 +326,7 @@ export default function Home() {
               </div>
             )}
             {viewSection === "Profile" && (
-              <div className="h-full w-full ">
+              <div className="h-full w-full">
                 {userDetails && <Profile data={userDetails} />}
               </div>
             )}

@@ -1,9 +1,10 @@
 import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import axios from "axios";
 import avatars from "../faceline/faceline.json";
 import AuthContext from "../services/context/AuthContext";
 import { toast } from "react-toastify";
+import { useCookies } from "react-cookie";
 export default function Signup() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -12,6 +13,7 @@ export default function Signup() {
   const [viewpass, setViewpass] = useState(false);
   const { login } = useContext(AuthContext);
   const [profileAvatar, setProfileAvatar] = useState("");
+  const [cookies] = useCookies(["user"]);
   const handleLogin = (e) => {
     e.preventDefault();
     axios
@@ -79,8 +81,9 @@ export default function Signup() {
       </>
     );
   };
-
-  return (
+  return cookies.token ? (
+    <Navigate to="/home" />
+  ) : (
     <div className="bg-primary-200 h-full px-5 py-10 flex items-center justify-center">
       <div className="mx-auto py-6  px-4 w-full  bg-white shadow-md rounded md:w-[500px] ">
         <img

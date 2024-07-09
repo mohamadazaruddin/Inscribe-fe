@@ -1,4 +1,5 @@
 import React from "react";
+import CancelIcon from "./Icons/CancelIcon";
 
 export default function CreatePostModal(props) {
   const [createPost, setCreatePost] = React.useState("");
@@ -13,6 +14,16 @@ export default function CreatePostModal(props) {
       >
         {props.mobView && (
           <div className="text-md text-center font-medium">Create a Post</div>
+        )}
+        {props.mobView && (
+          <div
+            className="text-md absolute top-2 right-2 cursor-pointer"
+            onClick={() => {
+              props.setViewSection("Home");
+            }}
+          >
+            <CancelIcon height="32px" width="32px" />
+          </div>
         )}
         <form
           onSubmit={(e) => {

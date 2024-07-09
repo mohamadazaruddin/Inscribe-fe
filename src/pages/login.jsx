@@ -1,17 +1,20 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 import AuthContext from "../services/context/AuthContext";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [viewpass, setViewpass] = useState(false);
   const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
   const handleLogin = async (e) => {
     e.preventDefault();
     login({ username, password });
   };
-  return (
+  const [cookies] = useCookies(["user"]);
+  return cookies.token ? (
+    <Navigate to="/home" />
+  ) : (
     <div className="bg-primary-200 h-full px-5 py-10 flex items-center justify-center ">
       <div className="mx-auto py-6  px-4 w-full  bg-white shadow-md rounded md:w-[500px] ">
         <img

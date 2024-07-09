@@ -8,7 +8,7 @@ export default function Profile({ data }) {
   const FollowingList = ({ list }) => {
     return (
       <>
-        <div className="bg-[#00000027] absolute top-0 left-0 right-0 bottom-0 z-10 h-full w-full"></div>
+        <div className="md:bg-[#00000027] absolute top-0 left-0 right-0 bottom-0 z-10 h-full w-full"></div>
         <div
           className={`w-[200px] md:w-[300px] absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-5 z-50 bg-contrast-200 shadow-md rounded-lg `}
         >
@@ -39,72 +39,78 @@ export default function Profile({ data }) {
     view: "",
   });
   return (
-    <div className="p-4 bg-contrast-200 h-full relative">
+    <>
       {showList?.data.length > 0 && <FollowingList list={showList} />}
-      <div className="mt-10 flex flex-col justify-between  items-center">
-        <div className="text-center w-full mb-10">
-          <img
-            src={`/assets/images/bitmoji/${data.profilepicture}`}
-            alt="profile img"
-            className={`w-[100px] h-[100px] rounded-full mx-auto`}
-          />
+      <div className="p-4 bg-contrast-200 h-full relative">
+        <div className="mt-10 flex flex-col justify-between  items-center">
+          <div className="text-center w-full mb-10">
+            <img
+              src={`/assets/images/bitmoji/${data.profilepicture}`}
+              alt="profile img"
+              className={`w-[100px] h-[100px] rounded-full mx-auto`}
+            />
 
-          <div className="text-lg font-medium capitalize mt-2">
-            {data.username}
-          </div>
-          <div className="text-sm text-gray-200">
-            Joined at {dateFormatter(data.accountCreatedAt)}
-          </div>
-
-          <div className="flex items-center justify-between mt-4 py-2 border-b border-t border-primary-200">
-            <div>
-              <p className="text-sm font-medium">{data.posts?.length}</p>
-              <p className="text-xs text-gray-200">Posts</p>
+            <div className="text-lg font-medium capitalize mt-2">
+              {data.username}
             </div>
-            <div>
-              <div
-                className="cursor-pointer"
-                onClick={() => {
-                  setShowList({
-                    data: data?.followers,
-                    view: "Followers",
-                  });
-                }}
-              >
-                <p className="text-sm font-medium">{data.followers?.length}</p>
-                <p className="text-xs text-gray-200">Followers</p>
+            <div className="text-sm text-gray-200">
+              Joined at {dateFormatter(data.accountCreatedAt)}
+            </div>
+
+            <div className="flex items-center justify-between mt-4 py-2 border-b border-t border-primary-200">
+              <div>
+                <p className="text-sm font-medium">{data.posts?.length}</p>
+                <p className="text-xs text-gray-200">Posts</p>
+              </div>
+              <div>
+                <div
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setShowList({
+                      data: data?.followers,
+                      view: "Followers",
+                    });
+                  }}
+                >
+                  <p className="text-sm font-medium">
+                    {data.followers?.length}
+                  </p>
+                  <p className="text-xs text-gray-200">Followers</p>
+                </div>
+              </div>
+              <div>
+                <div
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setShowList({
+                      data: data?.following,
+                      view: "Following",
+                    });
+                  }}
+                >
+                  <p className="text-sm font-medium">
+                    {data.following?.length}
+                  </p>
+                  <p className="text-xs text-gray-200">Following</p>
+                </div>
               </div>
             </div>
-            <div>
-              <div
-                className="cursor-pointer"
-                onClick={() => {
-                  setShowList({
-                    data: data?.following,
-                    view: "Following",
-                  });
-                }}
-              >
-                <p className="text-sm font-medium">{data.following?.length}</p>
-                <p className="text-xs text-gray-200">Following</p>
-              </div>
+            <div className="text-start mt-4">
+              <p className="text-md font-medium">About</p>
+              <p className="text-sm text-gray-200 mt-1">{data.bio}</p>
             </div>
           </div>
-          <div className="text-start mt-4">
-            <p className="text-md font-medium">About</p>
-            <p className="text-sm text-gray-200 mt-1">{data.bio}</p>
-          </div>
-        </div>
 
-        <div className="flex items-center justify-center md:absolute left-[50%] md:bottom-5 md:translate-x-[-50%] ">
-          <button
-            className="w-full bg-primary-200 py-2 px-5 rounded-md font-medium"
-            onClick={logout}
-          >
-            Logout
-          </button>
+          <div className="flex items-center justify-center md:absolute left-[50%] md:bottom-5 md:translate-x-[-50%] ">
+            <button
+              className="w-full bg-primary-200 py-2 px-5 rounded-md font-medium"
+              onClick={logout}
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
