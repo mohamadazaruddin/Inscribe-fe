@@ -117,7 +117,7 @@ export default function Signup() {
             </div>
             <div className="mb-6 relative">
               <div
-                className="absolute top-[35px] right-4"
+                className="absolute top-[35px] right-4 z-50 cursor-pointer"
                 onClick={() => setViewpass(!viewpass)}
               >
                 {viewpass ? "hide" : "show"}
