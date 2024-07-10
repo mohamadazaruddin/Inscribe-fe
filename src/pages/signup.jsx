@@ -11,11 +11,14 @@ export default function Signup() {
   const [bio, setBio] = useState("");
   const [stepper, setStepper] = useState(0);
   const [viewpass, setViewpass] = useState(false);
+  const [disableButton, setDisableButton] = useState(false);
   const { login } = useContext(AuthContext);
   const [profileAvatar, setProfileAvatar] = useState("");
+
   const [cookies] = useCookies(["user"]);
   const handleLogin = (e) => {
     e.preventDefault();
+    setDisableButton(true);
     axios
       .post(`${process.env.REACT_APP_API_BASE_URL}/users/signup`, {
         username: username,
@@ -94,7 +97,7 @@ export default function Signup() {
         {stepper === 0 ? (
           <ProfileAvatarSelector />
         ) : (
-          <form onSubmit={handleLogin} className="mt-8">
+          <form id="signup-form" onSubmit={handleLogin} className="mt-8">
             <div className="text-center text-[24px] font-semibold">
               {" "}
               Create Account
@@ -158,6 +161,7 @@ export default function Signup() {
             </div>
             <button
               type="submit"
+              disabled={disableButton}
               className="block w-full text-center bg-primary-500 rounded-full py-2 text-md font-medium text-contrast-200"
             >
               Sign up
