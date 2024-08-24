@@ -1,7 +1,7 @@
 import React from "react";
 import LikeIcon from "./Icons/LikeIcon";
 import Comment from "./Icons/Comment";
-// import ShareIcon from "./Icons/ShareIcon";
+import ShareIcon from "./Icons/ShareIcon";
 import { dateFormatter } from "../utils/dateFormatter";
 export default function Posts(props) {
   return (
@@ -52,9 +52,21 @@ export default function Posts(props) {
               {props.comment}
             </div>
           </div>
-          {/* <div className=" justify-center flex rounded-full items-center p-2 border-b border-primary-200 ">
-            <ShareIcon height="18px" width="18px" color="#374151" />
-          </div> */}
+          <div className=" justify-center flex rounded-full items-center p-2 border-b border-primary-200 ">
+            <ShareIcon
+              height="18px"
+              width="18px"
+              color="#374151"
+              onClick={() => {
+                props.setOpenShare({
+                  content: props.content,
+                  image: props.image,
+                  username: props.username,
+                  date: props.createdtime,
+                });
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -18,6 +18,7 @@ import CommentSection from "../components/CommentSection";
 import { Navigate } from "react-router-dom";
 import Likes from "../components/Likes";
 import Loader from "../components/Loader";
+import SharePost from "../components/SharePost";
 
 export default function Home() {
   const [viewSection, setViewSection] = React.useState("Home");
@@ -27,6 +28,7 @@ export default function Home() {
   const [totalusers, setTotalUsers] = React.useState();
   const [openComments, setOpenComments] = React.useState("");
   const [openlikes, setOpenLikes] = React.useState("");
+  const [openShare, setOpenShare] = React.useState("");
   // const [category, setCategory] = React.useState("newest");
   const [postComments, setPostComments] = React.useState();
   const [postLikes, setPostLikes] = React.useState();
@@ -103,6 +105,7 @@ export default function Home() {
         `${process.env.REACT_APP_API_BASE_URL}/users/${cookies.user.id}/notifications`
       )
       .then(function (response) {
+        console.log(response.headers.AxiosHeaders, "red");
         setNotifications(response.data);
       })
       .catch(function (err) {
@@ -266,6 +269,10 @@ export default function Home() {
             />
           )}
 
+          {openShare && (
+            <SharePost setOpenShare={setOpenShare} openShare={openShare} />
+          )}
+
           <div className="block md:hidden relative w-full h-full">
             {viewSection === "Home" && (
               <>
@@ -287,6 +294,8 @@ export default function Home() {
                           comment={item.comments.length}
                           likes={item.likes.length}
                           postId={item._id}
+                          openShare={openShare}
+                          setOpenShare={setOpenShare}
                         />
                       </div>
                       // <Posts image={item.} username={item.} createdtime={} content={item.content} comment={} />
@@ -369,6 +378,8 @@ export default function Home() {
                             comment={item.comments.length}
                             likes={item.likes.length}
                             postId={item._id}
+                            openShare={openShare}
+                            setOpenShare={setOpenShare}
                           />
                         </div>
                         // <Posts image={item.} username={item.} createdtime={} content={item.content} comment={} />
